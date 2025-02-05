@@ -14,7 +14,7 @@ This project is a simple SGPA (Semester Grade Point Average) calculator. It allo
 
 Link- https://sgpa-calculator-mu.vercel.app/
 
-![alt text](image.png)
+![alt text](public/Image.png)
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

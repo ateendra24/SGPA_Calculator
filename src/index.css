@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+th,
+td {
+  padding: 6px 12px;
+  text-align: left;
+}
+
+/* thead tr {
+  background-color: #3c66f3;
+  color: #ffffff;
+  text-align: left;
+  border-radius: 10px;
+} */
+
+
+input[type=number]::-webkit-inner-spin-button {
+  display: none;
+
+}
+
+input:focus {
+  border: none;
+  outline: none;
+}

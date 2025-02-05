@@ -1,7 +1,5 @@
 # React + Vite
 
-
-
 # SGPA Calculator
 
 ## Overview
@@ -14,10 +12,7 @@ This project is a simple SGPA (Semester Grade Point Average) calculator. It allo
 - Input validation for grades and credit hours
 - Accurate SGPA calculation based on user input
 
-
-Link- https://ateendra24.github.io/React_Calculator/
-
-
+Link- https://sgpa-calculator-mu.vercel.app/
 
 ![alt text](image.png)
 

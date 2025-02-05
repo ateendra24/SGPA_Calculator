@@ -113,8 +113,8 @@ function Year2() {
             <div id="container" className="flex flex-wrap gap-4 sm:gap-8 justify-center max-w-7xl mx-auto">
                 <div id="box2" className="bg-white p-4 sm:p-6 md:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 w-full max-w-xl">
                     <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-                        <span className="h-8 w-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3 text-lg">1</span>
-                        Semester 1
+                        <span className="h-8 w-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3 text-lg">3</span>
+                        Semester 3
                     </h2>
                     <table className="w-full mb-6 text-sm sm:text-base">
                         <thead className="bg-[#3c66f3] text-lg">
@@ -176,8 +176,8 @@ function Year2() {
 
                 <div id="box3" className="bg-white p-4 sm:p-6 md:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 w-full max-w-xl">
                     <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-                        <span className="h-8 w-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3 text-lg">2</span>
-                        Semester 2
+                        <span className="h-8 w-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3 text-lg">4</span>
+                        Semester 4
                     </h2>
                     <table className="w-full mb-6 text-sm sm:text-base">
                         <thead className="bg-[#3c66f3] text-lg">

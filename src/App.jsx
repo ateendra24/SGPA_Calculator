@@ -89,7 +89,7 @@ function App() {
       )}
 
       <div className="text-center text-gray-600 text-base mt-10 mb-2">
-        Appreciate the effort and time taken to make this website. By giving a star to this repository. <a href="https://github.com/ateendra24/React_Calculator" className="underline">Click here</a> to give a star.
+        Appreciate the effort and time taken to make this website. By giving a star to this repository. <a href="https://github.com/ateendra24/SGPA_Calculator" className="underline">Click here</a> to give a star.
       </div>
 
 

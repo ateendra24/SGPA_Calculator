@@ -95,7 +95,7 @@ function Year1() {
             <div id="box4" className="flex flex-col justify-center items-center mt-8 sm:mt-12 w-full">
                 <button
                     onClick={calculateYGPA}
-                    className="w-full sm:w-auto text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 font-medium rounded-xl text-lg px-8 py-4 transition-all duration-200 transform hover:scale-105 mb-6 shadow-lg"
+                    className="w-[90%] sm:w-auto text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 font-medium rounded-xl text-lg px-8 py-4 transition-all duration-200 transform hover:scale-105 mb-6 shadow-lg"
                 >
                     Calculate YGPA
                 </button>

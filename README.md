@@ -4,7 +4,7 @@
 
 ## Overview
 
-This project is a simple SGPA (Semester Grade Point Average) calculator. It allows users to input their grades and credit hours for each course in a semester, then calculates and displays the SGPA based on the input data.
+This project is a simple SGPA (Semester Grade Point Average) calculator designed exclusively for AKTU BTech students. It allows users to input their grades in a semester, then calculates and displays the SGPA based on the input data.
 
 ## Features
 

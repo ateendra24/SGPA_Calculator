@@ -8,14 +8,6 @@ td {
   text-align: left;
 }
 
-/* thead tr {
-  background-color: #3c66f3;
-  color: #ffffff;
-  text-align: left;
-  border-radius: 10px;
-} */
-
-
 input[type=number]::-webkit-inner-spin-button {
   display: none;
 

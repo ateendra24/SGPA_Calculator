@@ -10,7 +10,7 @@ export default function SemesterTable({
     calculateSGPA
 }) {
     return (
-        <div className="bg-white p-2 sm:p-4 md:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 w-full max-w-xl">
+        <div className="bg-white p-4 sm:p-6 md:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 w-full max-w-xl">
             <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
                 <span className="h-8 w-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3 text-lg">
                     {semesterNumber}

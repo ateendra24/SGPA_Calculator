@@ -3,6 +3,7 @@ import "./App.css";
 import Year1 from "./components/Year1";
 import Year2 from "./components/Year2";
 import GithubStar from "./components/GithubStar";
+import Year3 from "./components/Year3";
 
 function App() {
   const [selectedYear, setSelectedYear] = useState("1");
@@ -42,11 +43,7 @@ function App() {
 
       {selectedYear === "1" && <Year1 />}
       {selectedYear === "2" && <Year2 />}
-      {selectedYear === "3" && (
-        <div className="text-center py-40">
-          <p className="text-3xl font-bold animate-pulse">Coming Soon...</p>
-        </div>
-      )}
+      {selectedYear === "3" && <Year3 />}
       {selectedYear === "4" && (
         <div className="text-center py-40">
           <p className="text-3xl font-bold animate-pulse">Coming Soon...</p>

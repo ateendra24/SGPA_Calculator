@@ -62,6 +62,36 @@ export const YEAR_2 = {
     }
 };
 
+export const YEAR_3 = {
+    semester5: {
+        subjects: [
+            "Database Management System",
+            "Web Technology",
+            "Design and Analysis of Algorithm",
+            "Departmental Elective-I",
+            "Departmental Elective-II",
+            "Database Management System Lab",
+            "Web Technology Lab",
+            "Design and Analysis of Algorithm Lab",
+            "Mini Project or Internship",
+        ],
+        credits: [4, 4, 4, 3, 3, 1, 1, 1, 2],
+    },
+    semester6: {
+        subjects: [
+            "Software Engineering",
+            "Compiler Design",
+            "Computer Networks",
+            "Departmental Elective-III",
+            "Open Elective-I",
+            "Software Engineering Lab",
+            "Compiler Design Lab",
+            "Computer Networks Lab",
+        ],
+        credits: [4, 4, 4, 3, 3, 1, 1, 1],
+    }
+};
+
 export const calculateGrade = (totalMarks) => {
     if (totalMarks >= 90) return 10;
     if (totalMarks >= 80) return 9;

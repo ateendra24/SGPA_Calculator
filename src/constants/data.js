@@ -92,6 +92,30 @@ export const YEAR_3 = {
     }
 };
 
+export const YEAR_4 = {
+    semester7: {
+        subjects: [
+            "HSMC -1 / HSMC-2 ",
+            "Departmental Elective-IV",
+            "Departmental Elective-V",
+            "Open Elective-II",
+            "Departmental Elective Lab",
+            "Mini Project or Internship Assessment",
+            "Project"
+        ],
+        credits: [3, 3, 3, 3, 1, 1, 4],
+    },
+    semester8: {
+        subjects: [
+            "HSMC-1/HSMC-2",
+            "Open Elective-III",
+            "Open Elective-IV",
+            "Project"
+        ],
+        credits: [3, 3, 3, 9],
+    }
+};
+
 export const calculateGrade = (totalMarks) => {
     if (totalMarks >= 90) return 10;
     if (totalMarks >= 80) return 9;

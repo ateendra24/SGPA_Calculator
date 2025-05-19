@@ -4,6 +4,7 @@ import Year1 from "./components/Year1";
 import Year2 from "./components/Year2";
 import GithubStar from "./components/GithubStar";
 import Year3 from "./components/Year3";
+import YEAR4 from "./components/Year4";
 
 function App() {
   const [selectedYear, setSelectedYear] = useState("1");
@@ -44,11 +45,7 @@ function App() {
       {selectedYear === "1" && <Year1 />}
       {selectedYear === "2" && <Year2 />}
       {selectedYear === "3" && <Year3 />}
-      {selectedYear === "4" && (
-        <div className="text-center py-40">
-          <p className="text-3xl font-bold animate-pulse">Coming Soon...</p>
-        </div>
-      )}
+      {selectedYear === "4" && <YEAR4 />}
 
       <div className="text-center text-gray-600 text-base mt-10">
         Appreciate the effort and time taken to make this website. By giving a star to this repository. <a href="https://github.com/ateendra24/SGPA_Calculator" className="underline">Click here</a> to give a star.

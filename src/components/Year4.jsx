@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import { YEAR_3, calculateGrade } from '../constants/data';
+import { YEAR_4, calculateGrade } from '../constants/data';
 import SemesterTable from './SemesterTable';
 
 function Year3() {
     const [marks1, setMarks1] = useState(
-        YEAR_3.semester5.subjects.map(() => ({ internal: "", theory: "" }))
+        YEAR_4.semester7.subjects.map(() => ({ internal: "", theory: "" }))
     );
     const [marks2, setMarks2] = useState(
-        YEAR_3.semester6.subjects.map(() => ({ internal: "", theory: "" }))
+        YEAR_4.semester8.subjects.map(() => ({ internal: "", theory: "" }))
     );
     const [sgpa1, setSgpa1] = useState(0);
     const [sgpa2, setSgpa2] = useState(0);
@@ -26,7 +26,7 @@ function Year3() {
         marks1.forEach((mark, index) => {
             const total = mark.internal + mark.theory;
             const grade = calculateGrade(total);
-            const credit = YEAR_3.semester5.credits[index];
+            const credit = YEAR_4.semester7.credits[index];
             const creditPoints = grade * credit;
 
             totalCreditPoints += creditPoints;
@@ -53,7 +53,7 @@ function Year3() {
         marks2.forEach((mark2, index) => {
             const total2 = mark2.internal + mark2.theory;
             const grade2 = calculateGrade(total2);
-            const credit2 = YEAR_3.semester6.credits[index];  // FIXED: Use semester6 credits
+            const credit2 = YEAR_4.semester8.credits[index];
             const creditPoints2 = grade2 * credit2;
 
             totalCreditPoints += creditPoints2;
@@ -73,20 +73,20 @@ function Year3() {
         <>
             <div className="flex flex-wrap gap-4 sm:gap-8 justify-center max-w-7xl mx-auto">
                 <SemesterTable
-                    semesterNumber={5}
-                    subjects={YEAR_3.semester5.subjects}
+                    semesterNumber={7}
+                    subjects={YEAR_4.semester7.subjects}
                     marks={marks1}
                     handleInputChange={handleInputChange}
-                    totalCredits={YEAR_3.semester5.credits.reduce((a, b) => a + b, 0)}
+                    totalCredits={YEAR_4.semester7.credits.reduce((a, b) => a + b, 0)}
                     sgpa={sgpa1}
                     calculateSGPA={calculateSGPA}
                 />
                 <SemesterTable
-                    semesterNumber={6}
-                    subjects={YEAR_3.semester6.subjects}
+                    semesterNumber={8}
+                    subjects={YEAR_4.semester8.subjects}
                     marks={marks2}
                     handleInputChange={handleInputChange2}
-                    totalCredits={YEAR_3.semester6.credits.reduce((a, b) => a + b, 0)}
+                    totalCredits={YEAR_4.semester8.credits.reduce((a, b) => a + b, 0)}
                     sgpa={sgpa2}
                     calculateSGPA={calculateSGPA2}
                 />

@@ -2,13 +2,19 @@ import React from 'react';
 
 export default function SemesterTable({
     semesterNumber,
-    subjects,
-    marks,
+    subjects = [],
+    marks = [],
+    credits = [],
     handleInputChange,
     totalCredits,
     sgpa,
     calculateSGPA
 }) {
+    // Ensure marks array is properly sized
+    const safeMarks = marks.length === subjects.length
+        ? marks
+        : subjects.map((_, index) => marks[index] || { internal: "", theory: "" });
+
     return (
         <div className="bg-white p-4 sm:p-6 md:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 w-full max-w-xl">
             <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
@@ -28,7 +34,7 @@ export default function SemesterTable({
                 <tbody className="px-2 sm:px-3">
                     {subjects.map((subject, index) => (
                         <tr key={index} className="border-b border-gray-50">
-                            <td className="py-2 sm:py-3 text-gray-800 font-medium text-sm">{subject}</td>
+                            <td className="py-2 sm:py-3 text-gray-800 font-medium text-sm">{subject} ({credits[index] || 0})</td>
                             <td className="py-2 sm:py-3 pr-1 sm:pr-2">
                                 <input
                                     className="w-full px-2 sm:px-3 py-1 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
@@ -36,7 +42,7 @@ export default function SemesterTable({
                                     min="1"
                                     max="100"
                                     type="number"
-                                    value={marks[index].internal}
+                                    value={safeMarks[index]?.internal || ""}
                                     onChange={(e) => handleInputChange(index, "internal", e.target.value)}
                                 />
                             </td>
@@ -47,7 +53,7 @@ export default function SemesterTable({
                                     type="number"
                                     min="1"
                                     max="100"
-                                    value={marks[index].theory}
+                                    value={safeMarks[index]?.theory || ""}
                                     onChange={(e) => handleInputChange(index, "theory", e.target.value)}
                                 />
                             </td>

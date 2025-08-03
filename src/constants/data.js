@@ -60,9 +60,8 @@ export const YEARS_DATA = {
                 "JAVA Lab",
                 "Cyber Security Workshop",
                 "Python Programming",
-                "Yoga-2"
             ],
-            credits: [4, 3, 4, 4, 3, 1, 1, 1, 2, 0],
+            credits: [4, 3, 4, 4, 3, 1, 1, 1, 2],
         }
     },
     3: {
@@ -100,34 +99,27 @@ export const YEARS_DATA = {
         semester1: {
             number: 7,
             subjects: [
-                "HSMC -1 / HSMC-2 ",
+                "Artificial Intelligence",
                 "Departmental Elective-IV",
-                "Departmental Elective-V",
                 "Open Elective-II",
-                "Departmental Elective Lab",
+                "Artificial Intelligence LAB",
                 "Mini Project or Internship Assessment",
-                "Project"
+                "Project-I",
+                "Startup and Entrepreneurial Activity Assessment"
             ],
-            credits: [3, 3, 3, 3, 1, 1, 4],
+            credits: [3, 3, 3, 1, 2, 5, 2],
         },
         semester2: {
             number: 8,
             subjects: [
-                "HSMC-1/HSMC-2",
                 "Open Elective-III",
                 "Open Elective-IV",
-                "Project"
+                "Project-II"
             ],
-            credits: [3, 3, 3, 9],
+            credits: [3, 3, 10],
         }
     }
 };
-
-// Keep the old exports for backward compatibility during transition
-export const YEAR_1 = YEARS_DATA[1];
-export const YEAR_2 = YEARS_DATA[2];
-export const YEAR_3 = YEARS_DATA[3];
-export const YEAR_4 = YEARS_DATA[4];
 
 export const calculateGrade = (totalMarks) => {
     if (totalMarks >= 90) return 10;

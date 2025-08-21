@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { YEARS_DATA, calculateGrade } from '../constants/data';
 import SemesterTable from './SemesterTable';
 
@@ -19,15 +19,41 @@ function YearComponent({ year }) {
             yearData.semester2.subjects.length, yearData.semester2.credits.length);
     }
 
-    const [marks1, setMarks1] = useState(() =>
-        yearData.semester1.subjects.map(() => ({ internal: "", theory: "" }))
-    );
-    const [marks2, setMarks2] = useState(() =>
-        yearData.semester2.subjects.map(() => ({ internal: "", theory: "" }))
-    );
-    const [sgpa1, setSgpa1] = useState(0);
-    const [sgpa2, setSgpa2] = useState(0);
-    const [ygpa, setYgpa] = useState(0);
+
+    // LocalStorage keys per year
+    const storageKey = (field) => `sgpa_${year}_${field}`;
+
+    // Load from localStorage or default
+    const getInitial = (field, defaultValue) => {
+        try {
+            const val = localStorage.getItem(storageKey(field));
+            if (val) return JSON.parse(val);
+        } catch { }
+        return defaultValue;
+    };
+
+
+    const [marks1, setMarks1] = useState(() => getInitial('marks1', yearData.semester1.subjects.map(() => ({ internal: "", theory: "" }))));
+    const [marks2, setMarks2] = useState(() => getInitial('marks2', yearData.semester2.subjects.map(() => ({ internal: "", theory: "" }))));
+    const [sgpa1, setSgpa1] = useState(() => getInitial('sgpa1', 0));
+    const [sgpa2, setSgpa2] = useState(() => getInitial('sgpa2', 0));
+    const [ygpa, setYgpa] = useState(() => getInitial('ygpa', 0));
+
+    // Reset state when year changes
+    useEffect(() => {
+        setMarks1(getInitial('marks1', yearData.semester1.subjects.map(() => ({ internal: "", theory: "" }))));
+        setMarks2(getInitial('marks2', yearData.semester2.subjects.map(() => ({ internal: "", theory: "" }))));
+        setSgpa1(getInitial('sgpa1', 0));
+        setSgpa2(getInitial('sgpa2', 0));
+        setYgpa(getInitial('ygpa', 0));
+    }, [year]);
+
+    // Save to localStorage on change
+    useEffect(() => { localStorage.setItem(storageKey('marks1'), JSON.stringify(marks1)); }, [marks1]);
+    useEffect(() => { localStorage.setItem(storageKey('marks2'), JSON.stringify(marks2)); }, [marks2]);
+    useEffect(() => { localStorage.setItem(storageKey('sgpa1'), JSON.stringify(sgpa1)); }, [sgpa1]);
+    useEffect(() => { localStorage.setItem(storageKey('sgpa2'), JSON.stringify(sgpa2)); }, [sgpa2]);
+    useEffect(() => { localStorage.setItem(storageKey('ygpa'), JSON.stringify(ygpa)); }, [ygpa]);
 
     const handleInputChange = (index, type, value) => {
         if (index < 0 || index >= marks1.length) return;

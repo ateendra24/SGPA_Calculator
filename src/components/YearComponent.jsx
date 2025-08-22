@@ -19,7 +19,6 @@ function YearComponent({ year }) {
             yearData.semester2.subjects.length, yearData.semester2.credits.length);
     }
 
-
     // LocalStorage keys per year
     const storageKey = (field) => `sgpa_${year}_${field}`;
 
@@ -32,12 +31,25 @@ function YearComponent({ year }) {
         return defaultValue;
     };
 
-
     const [marks1, setMarks1] = useState(() => getInitial('marks1', yearData.semester1.subjects.map(() => ({ internal: "", theory: "" }))));
     const [marks2, setMarks2] = useState(() => getInitial('marks2', yearData.semester2.subjects.map(() => ({ internal: "", theory: "" }))));
     const [sgpa1, setSgpa1] = useState(() => getInitial('sgpa1', 0));
     const [sgpa2, setSgpa2] = useState(() => getInitial('sgpa2', 0));
     const [ygpa, setYgpa] = useState(() => getInitial('ygpa', 0));
+
+    // Reset handler for this year
+    const handleReset = () => {
+        localStorage.removeItem(storageKey('marks1'));
+        localStorage.removeItem(storageKey('marks2'));
+        localStorage.removeItem(storageKey('sgpa1'));
+        localStorage.removeItem(storageKey('sgpa2'));
+        localStorage.removeItem(storageKey('ygpa'));
+        setMarks1(yearData.semester1.subjects.map(() => ({ internal: "", theory: "" })));
+        setMarks2(yearData.semester2.subjects.map(() => ({ internal: "", theory: "" })));
+        setSgpa1(0);
+        setSgpa2(0);
+        setYgpa(0);
+    };
 
     // Reset state when year changes
     useEffect(() => {
@@ -132,29 +144,42 @@ function YearComponent({ year }) {
         } else {
             setYgpa("0.00");
         }
-    }; return (
+    };
+
+    return (
         <>
-            <div className="flex flex-wrap gap-4 sm:gap-8 justify-center max-w-7xl mx-auto">
-                <SemesterTable
-                    semesterNumber={yearData.semester1.number}
-                    subjects={yearData.semester1.subjects}
-                    marks={marks1}
-                    credits={yearData.semester1.credits}
-                    handleInputChange={handleInputChange}
-                    totalCredits={yearData.semester1.credits.filter(credit => credit > 0).reduce((a, b) => a + b, 0)}
-                    sgpa={sgpa1}
-                    calculateSGPA={calculateSGPA}
-                />
-                <SemesterTable
-                    semesterNumber={yearData.semester2.number}
-                    subjects={yearData.semester2.subjects}
-                    marks={marks2}
-                    credits={yearData.semester2.credits}
-                    handleInputChange={handleInputChange2}
-                    totalCredits={yearData.semester2.credits.filter(credit => credit > 0).reduce((a, b) => a + b, 0)}
-                    sgpa={sgpa2}
-                    calculateSGPA={calculateSGPA2}
-                />
+            <div className="flex flex-col max-w-7xl mx-auto">
+                <div className="flex justify-end mb-2">
+                    <button
+                        onClick={handleReset}
+                        className="border border-gray-400 text-gray-700 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400 font-medium rounded-lg text-sm px-4 py-2 transition-colors duration-200"
+                        title="Reset all data for this year"
+                    >
+                        Reset All Data
+                    </button>
+                </div>
+                <div className="flex flex-wrap gap-4 sm:gap-8 justify-center">
+                    <SemesterTable
+                        semesterNumber={yearData.semester1.number}
+                        subjects={yearData.semester1.subjects}
+                        marks={marks1}
+                        credits={yearData.semester1.credits}
+                        handleInputChange={handleInputChange}
+                        totalCredits={yearData.semester1.credits.filter(credit => credit > 0).reduce((a, b) => a + b, 0)}
+                        sgpa={sgpa1}
+                        calculateSGPA={calculateSGPA}
+                    />
+                    <SemesterTable
+                        semesterNumber={yearData.semester2.number}
+                        subjects={yearData.semester2.subjects}
+                        marks={marks2}
+                        credits={yearData.semester2.credits}
+                        handleInputChange={handleInputChange2}
+                        totalCredits={yearData.semester2.credits.filter(credit => credit > 0).reduce((a, b) => a + b, 0)}
+                        sgpa={sgpa2}
+                        calculateSGPA={calculateSGPA2}
+                    />
+                </div>
             </div>
 
             <div id="box4" className="flex flex-col justify-center items-center mt-8 sm:mt-12 w-full">
@@ -164,7 +189,7 @@ function YearComponent({ year }) {
                 >
                     Calculate YGPA
                 </button>
-                <div className="text-3xl sm:text-4xl font-bold text-gray-800 flex items-center gap-3">
+                <div className="text-3xl sm:text-4xl font-bold text-gray-800 flex items-center gap-3 mb-4">
                     YGPA: <span className="text-red-600 bg-red-50 px-4 py-2 rounded-xl">{ygpa}</span>
                 </div>
             </div>

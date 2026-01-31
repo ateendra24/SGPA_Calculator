@@ -44,9 +44,18 @@ export default function SemesterTable({
                                     type="number"
                                     value={safeMarks[index]?.internal || ""}
                                     onChange={(e) => handleInputChange(index, "internal", e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            const inputs = Array.from(document.querySelectorAll("input[type='number']"));
+                                            const index = inputs.indexOf(e.target);
+                                            if (index > -1 && index < inputs.length - 1) {
+                                                inputs[index + 1].focus();
+                                            }
+                                        }
+                                    }}
                                 />
                             </td>
-                            <td className="py-2 sm:py-3 pl-1 sm:pl-2">
+                            <td className="py-2 sm:py-3 pl-1 sm:pl-2 relative">
                                 <input
                                     className="w-full px-2 sm:px-3 py-1 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                                     placeholder="00"
@@ -55,7 +64,49 @@ export default function SemesterTable({
                                     max="100"
                                     value={safeMarks[index]?.theory || ""}
                                     onChange={(e) => handleInputChange(index, "theory", e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            const inputs = Array.from(document.querySelectorAll("input[type='number']"));
+                                            const index = inputs.indexOf(e.target);
+                                            if (index > -1 && index < inputs.length - 1) {
+                                                inputs[index + 1].focus();
+                                            }
+                                        }
+                                    }}
                                 />
+                                {(() => {
+                                    const internal = parseInt(safeMarks[index]?.internal) || 0;
+                                    const theory = parseInt(safeMarks[index]?.theory) || 0;
+                                    if (internal === 0 && theory === 0) return null; // Don't show if empty
+
+                                    const total = internal + theory;
+                                    const thresholds = [40, 45, 50, 60, 70, 80, 90];
+                                    let nextThreshold = null;
+
+                                    for (const t of thresholds) {
+                                        if (total < t) {
+                                            if (t - total <= 2) {
+                                                nextThreshold = t;
+                                            }
+                                            break;
+                                        }
+                                    }
+
+                                    if (nextThreshold) {
+                                        const diff = nextThreshold - total;
+                                        return (
+                                            <div className="absolute top-1/2 right-4 md:right-6 transform -translate-y-1/2 z-10 group">
+                                                <div className="w-5 h-5 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-xs font-bold border border-orange-200 cursor-help shadow-sm animate-pulse">
+                                                    i
+                                                </div>
+                                                <div className="absolute bottom-full right-1/2 translate-x-1/2 mb-2 hidden group-hover:block bg-orange-50 text-orange-700 text-[10px] sm:text-xs px-2 py-1 rounded shadow-md border border-orange-200 whitespace-nowrap z-20">
+                                                    <span>⚠️ +{diff} marks for {nextThreshold}</span>
+                                                </div>
+                                            </div>
+                                        );
+                                    }
+                                    return null;
+                                })()}
                             </td>
                         </tr>
                     ))}

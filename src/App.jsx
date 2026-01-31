@@ -1,10 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import YearComponent from "./components/YearComponent";
 import GithubStar from "./components/GithubStar";
 
 function App() {
   const [selectedYear, setSelectedYear] = useState("1");
+  const [showSaveToast, setShowSaveToast] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Check for Ctrl+S or Cmd+S
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault(); // Prevent browser save dialog
+        setShowSaveToast(true);
+        setTimeout(() => setShowSaveToast(false), 3000); // Hide after 3 seconds
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-200 pt-8 px-4 sm:pt-12 sm:px-8">
@@ -46,6 +61,21 @@ function App() {
       </div>
 
       <GithubStar />
+
+      {/* Save Notification Popup */}
+      <div
+        className={`fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 ease-in-out ${showSaveToast ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
+          }`}
+      >
+        <div className="bg-gray-800 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 border border-gray-700">
+          <div className="bg-green-500 rounded-full p-1">
+            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <span className="font-medium text-sm sm:text-base">Data saved into Local Storage.</span>
+        </div>
+      </div>
     </div>
   );
 }

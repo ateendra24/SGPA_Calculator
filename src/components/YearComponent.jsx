@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import confetti from 'canvas-confetti';
 import { YEARS_DATA, calculateGrade } from '../constants/data';
 import SemesterTable from './SemesterTable';
 
@@ -95,6 +96,14 @@ function YearComponent({ year }) {
         const sgpa = totalCredits > 0 ? totalCreditPoints / totalCredits : 0;
         console.log(`Semester ${yearData.semester1.number}: totalCreditPoints=${totalCreditPoints}, totalCredits=${totalCredits}, SGPA=${sgpa}`);
         setSgpa1(sgpa.toFixed(2));
+
+        if (sgpa >= 8.5) {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
     };
 
     const handleInputChange2 = (index2, type2, value2) => {
@@ -128,6 +137,14 @@ function YearComponent({ year }) {
         const sgpa2 = totalCredits > 0 ? totalCreditPoints / totalCredits : 0;
         console.log(`Semester ${yearData.semester2.number}: totalCreditPoints=${totalCreditPoints}, totalCredits=${totalCredits}, SGPA=${sgpa2}`);
         setSgpa2(sgpa2.toFixed(2));
+
+        if (sgpa2 >= 8.5) {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
     };
 
     const calculateYGPA = () => {

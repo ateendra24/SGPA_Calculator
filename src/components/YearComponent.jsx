@@ -199,10 +199,27 @@ function YearComponent({ year }) {
                 </div>
             </div>
 
-            <div id="box4" className="flex flex-col justify-center items-center mt-8 sm:mt-12 w-full">
+            {(() => {
+                const marks1Total = marks1.reduce((acc, curr) => acc + (parseInt(curr.internal) || 0) + (parseInt(curr.theory) || 0), 0);
+                const marks2Total = marks2.reduce((acc, curr) => acc + (parseInt(curr.internal) || 0) + (parseInt(curr.theory) || 0), 0);
+                const totalObtained = marks1Total + marks2Total;
+                // Assumes max marks per subject is 100
+                const totalMax = (marks1.length + marks2.length) * 100;
+                const percentage = totalMax > 0 ? ((totalObtained / totalMax) * 100).toFixed(2) : "0.00";
+
+                return (
+                    <div className="flex gap-4 text-gray-700 bg-white/50 px-6 py-3 rounded-xl border border-white shadow-sm mt-3 w-fit mx-auto">
+                        <span className="font-medium">Total: {totalObtained}/{totalMax}</span>
+                        <span className="w-px bg-gray-300"></span>
+                        <span className="font-medium text-blue-600">{percentage}%</span>
+                    </div>
+                );
+            })()}
+
+            <div id="box4" className="flex flex-col justify-center items-center mt-4 sm:mt-6 w-full">
                 <button
                     onClick={calculateYGPA}
-                    className="w-[90%] sm:w-auto text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 font-medium rounded-xl text-lg px-8 py-4 transition-all duration-200 transform hover:scale-105 mb-6 shadow-lg"
+                    className="w-[90%] sm:w-auto text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 font-medium rounded-xl text-lg px-8 py-4 transition-all duration-200 transform hover:scale-105 mb-3 shadow-lg"
                 >
                     Calculate YGPA
                 </button>

@@ -16,7 +16,7 @@ export default function SemesterTable({
         : subjects.map((_, index) => marks[index] || { internal: "", theory: "" });
 
     return (
-        <div className="bg-white p-4 sm:p-6 md:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 w-full max-w-xl">
+        <div className="bg-white flex flex-col p-4 sm:p-6 md:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 w-full max-w-xl">
             <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
                 <span className="h-8 w-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3 text-lg">
                     {semesterNumber}
@@ -113,7 +113,22 @@ export default function SemesterTable({
                 </tbody>
             </table>
 
-            <p className="text-gray-600 mb-2">Total Credits: {totalCredits}</p>
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-4 mt-auto text-sm font-medium text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                <span>Total Credits: <span className="text-gray-900">{totalCredits}</span></span>
+                {(() => {
+                    const totalObtained = safeMarks.reduce((acc, curr) => acc + (parseInt(curr.internal) || 0) + (parseInt(curr.theory) || 0), 0);
+                    // Assuming max marks per subject is 100 (which is implied by the inputs)
+                    const totalMax = safeMarks.length * 100;
+                    const percentage = totalMax > 0 ? ((totalObtained / totalMax) * 100).toFixed(2) : "0.00";
+
+                    return (
+                        <>
+                            <span>Marks: <span className="text-gray-900">{totalObtained}</span>/{totalMax}</span>
+                            <span>Percentage: <span className="text-blue-600">{percentage}%</span></span>
+                        </>
+                    );
+                })()}
+            </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-2">
                 <button

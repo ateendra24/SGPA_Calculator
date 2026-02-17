@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./App.css";
 import YearComponent from "./components/YearComponent";
 import GithubStar from "./components/GithubStar";
+import { Analytics } from "@vercel/analytics/react";
 
 function App() {
   const [selectedYear, setSelectedYear] = useState("1");
@@ -76,6 +77,8 @@ function App() {
           <span className="font-medium text-sm sm:text-base">Data saved into Local Storage.</span>
         </div>
       </div>
+
+      <Analytics />
     </div>
   );
 }

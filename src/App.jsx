@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 import YearComponent from "./components/YearComponent";
 import GithubStar from "./components/GithubStar";
@@ -57,8 +57,9 @@ function App() {
 
       {selectedYear && <YearComponent year={parseInt(selectedYear)} />}
 
-      <div className="text-center text-gray-600 text-base mt-10">
-        Appreciate the effort and time taken to make this website. By giving a star to this repository. <a href="https://github.com/ateendra24/SGPA_Calculator" className="underline">Click here</a> to give a star.
+      <div className="text-center text-base mt-10 pb-2">
+        <p className="text-gray-700">To Report an issue and request features, please visit the <a href="https://github.com/ateendra24/SGPA_Calculator/issues" className="underline">Issues</a> page.</p>
+        <p className="text-gray-600">Appreciate the effort and time taken to make this website. By giving a star to this repository. <a href="https://github.com/ateendra24/SGPA_Calculator" className="underline">Click here</a> to give a star.</p>
       </div>
 
       <GithubStar />

@@ -46,6 +46,7 @@ function App() {
             value={selectedYear}
             onChange={(e) => setSelectedYear(e.target.value)}
             className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-800 font-medium cursor-pointer hover:border-gray-400 transition-colors"
+            aria-label="Select year"
           >
             <option value="1">1st Year</option>
             <option value="2">2nd Year</option>
@@ -57,9 +58,9 @@ function App() {
 
       {selectedYear && <YearComponent year={parseInt(selectedYear)} />}
 
-      <div className="text-center text-base mt-10 pb-2">
+      <div className="text-center text-xs sm:text-sm md:text-base mt-10 pb-2">
         <p className="text-gray-700">To Report an issue and request features, please visit the <a href="https://github.com/ateendra24/SGPA_Calculator/issues" className="underline">Issues</a> page.</p>
-        <p className="text-gray-600">Appreciate the effort and time taken to make this website. By giving a star to this repository. <a href="https://github.com/ateendra24/SGPA_Calculator" className="underline">Click here</a> to give a star.</p>
+        <p className="text-gray-600">Appreciate the effort and time taken to make this website. By <a href="https://github.com/ateendra24/SGPA_Calculator" className="underline">giving a star</a> to this repository.</p>
       </div>
 
       <GithubStar />

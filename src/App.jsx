@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import "./App.css";
 import YearComponent from "./components/YearComponent";
 import GithubStar from "./components/GithubStar";
+import VisitorCount from "./components/VisitorCount";
 import { Analytics } from "@vercel/analytics/react";
 
 function App() {
@@ -40,6 +41,8 @@ function App() {
             @ateendra
           </a>
         </p>
+
+        <VisitorCount />
 
         <div className="mt-6">
           <select

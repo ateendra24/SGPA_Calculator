@@ -81,7 +81,10 @@ function YearComponent({ year }) {
 
         marks1.forEach((mark, index) => {
             const total = mark.internal + mark.theory;
-            const grade = calculateGrade(total);
+            const subjectMax = yearData.semester1.maxMarks?.[index] || 100;
+            // Normalize to 0–100 scale for grade calculation
+            const normalizedTotal = (total / subjectMax) * 100;
+            const grade = calculateGrade(normalizedTotal);
             const credit = yearData.semester1.credits[index] || 0;
 
             // Only include subjects with credits > 0 in SGPA calculation
@@ -122,7 +125,10 @@ function YearComponent({ year }) {
 
         marks2.forEach((mark2, index) => {
             const total2 = mark2.internal + mark2.theory;
-            const grade2 = calculateGrade(total2);
+            const subjectMax2 = yearData.semester2.maxMarks?.[index] || 100;
+            // Normalize to 0–100 scale for grade calculation
+            const normalizedTotal2 = (total2 / subjectMax2) * 100;
+            const grade2 = calculateGrade(normalizedTotal2);
             const credit2 = yearData.semester2.credits[index] || 0;
 
             // Only include subjects with credits > 0 in SGPA calculation
@@ -181,6 +187,7 @@ function YearComponent({ year }) {
                         subjects={yearData.semester1.subjects}
                         marks={marks1}
                         credits={yearData.semester1.credits}
+                        maxMarks={yearData.semester1.maxMarks || []}
                         handleInputChange={handleInputChange}
                         totalCredits={yearData.semester1.credits.filter(credit => credit > 0).reduce((a, b) => a + b, 0)}
                         sgpa={sgpa1}
@@ -191,6 +198,7 @@ function YearComponent({ year }) {
                         subjects={yearData.semester2.subjects}
                         marks={marks2}
                         credits={yearData.semester2.credits}
+                        maxMarks={yearData.semester2.maxMarks || []}
                         handleInputChange={handleInputChange2}
                         totalCredits={yearData.semester2.credits.filter(credit => credit > 0).reduce((a, b) => a + b, 0)}
                         sgpa={sgpa2}
@@ -203,8 +211,10 @@ function YearComponent({ year }) {
                 const marks1Total = marks1.reduce((acc, curr) => acc + (parseInt(curr.internal) || 0) + (parseInt(curr.theory) || 0), 0);
                 const marks2Total = marks2.reduce((acc, curr) => acc + (parseInt(curr.internal) || 0) + (parseInt(curr.theory) || 0), 0);
                 const totalObtained = marks1Total + marks2Total;
-                // Assumes max marks per subject is 100
-                const totalMax = (marks1.length + marks2.length) * 100;
+                // Sum actual max marks per subject (defaults to 100)
+                const sem1Max = marks1.reduce((acc, _, i) => acc + (yearData.semester1.maxMarks?.[i] || 100), 0);
+                const sem2Max = marks2.reduce((acc, _, i) => acc + (yearData.semester2.maxMarks?.[i] || 100), 0);
+                const totalMax = sem1Max + sem2Max;
                 const percentage = totalMax > 0 ? ((totalObtained / totalMax) * 100).toFixed(2) : "0.00";
 
                 return (

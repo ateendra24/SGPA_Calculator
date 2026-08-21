@@ -108,6 +108,7 @@ export const YEARS_DATA = {
                 "Startup and Entrepreneurial Activity Assessment"
             ],
             credits: [3, 3, 3, 1, 2, 5, 2],
+            maxMarks: [100, 100, 100, 100, 100, 150, 100],
         },
         semester2: {
             number: 8,
@@ -117,6 +118,7 @@ export const YEARS_DATA = {
                 "Project-II"
             ],
             credits: [3, 3, 10],
+            maxMarks: [100, 100, 450],
         }
     }
 };

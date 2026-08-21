@@ -5,6 +5,7 @@ export default function SemesterTable({
     subjects = [],
     marks = [],
     credits = [],
+    maxMarks = [],
     handleInputChange,
     totalCredits,
     sgpa,
@@ -40,7 +41,7 @@ export default function SemesterTable({
                                     className="w-full px-2 sm:px-3 py-1 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                                     placeholder="00"
                                     min="1"
-                                    max="100"
+                                    max={maxMarks[index] || 100}
                                     type="number"
                                     value={safeMarks[index]?.internal || ""}
                                     onChange={(e) => handleInputChange(index, "internal", e.target.value)}
@@ -61,7 +62,7 @@ export default function SemesterTable({
                                     placeholder="00"
                                     type="number"
                                     min="1"
-                                    max="100"
+                                    max={maxMarks[index] || 100}
                                     value={safeMarks[index]?.theory || ""}
                                     onChange={(e) => handleInputChange(index, "theory", e.target.value)}
                                     onKeyDown={(e) => {
@@ -80,12 +81,15 @@ export default function SemesterTable({
                                     if (internal === 0 && theory === 0) return null; // Don't show if empty
 
                                     const total = internal + theory;
-                                    const thresholds = [40, 45, 50, 60, 70, 80, 90];
+                                    const subjectMax = maxMarks[index] || 100;
+                                    // Scale grade boundaries proportionally to subject max marks
+                                    const scale = subjectMax / 100;
+                                    const thresholds = [40, 45, 50, 60, 70, 80, 90].map(t => Math.round(t * scale));
                                     let nextThreshold = null;
 
                                     for (const t of thresholds) {
                                         if (total < t) {
-                                            if (t - total <= 2) {
+                                            if (t - total <= Math.max(2, Math.round(2 * scale))) {
                                                 nextThreshold = t;
                                             }
                                             break;
@@ -117,8 +121,7 @@ export default function SemesterTable({
                 <span>Total Credits: <span className="text-gray-900">{totalCredits}</span></span>
                 {(() => {
                     const totalObtained = safeMarks.reduce((acc, curr) => acc + (parseInt(curr.internal) || 0) + (parseInt(curr.theory) || 0), 0);
-                    // Assuming max marks per subject is 100 (which is implied by the inputs)
-                    const totalMax = safeMarks.length * 100;
+                    const totalMax = safeMarks.reduce((acc, _, i) => acc + (maxMarks[i] || 100), 0);
                     const percentage = totalMax > 0 ? ((totalObtained / totalMax) * 100).toFixed(2) : "0.00";
 
                     return (

@@ -35,7 +35,12 @@ export default function SemesterTable({
                 <tbody className="px-2 sm:px-3">
                     {subjects.map((subject, index) => (
                         <tr key={index} className="border-b border-gray-50">
-                            <td className="py-2 sm:py-3 text-gray-800 font-medium text-sm">{subject} ({credits[index] || 0})</td>
+                            <td className="py-2 sm:py-3 text-gray-800 font-medium text-sm">
+                                {subject} ({credits[index] || 0})
+                                {(maxMarks[index] && maxMarks[index] !== 100) && (
+                                    <span className="inline-flex items-center ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-600 border border-blue-100 leading-none">Max: {maxMarks[index]}</span>
+                                )}
+                            </td>
                             <td className="py-2 sm:py-3 pr-1 sm:pr-2">
                                 <input
                                     className="w-full px-2 sm:px-3 py-1 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"

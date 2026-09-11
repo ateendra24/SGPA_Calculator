@@ -4,6 +4,7 @@ import YearComponent from "./components/YearComponent";
 import GithubStar from "./components/GithubStar";
 import VisitorCount from "./components/VisitorCount";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 function App() {
   const [selectedYear, setSelectedYear] = useState("1");
@@ -84,6 +85,7 @@ function App() {
       </div>
 
       <Analytics />
+      <SpeedInsights />
     </div>
   );
 }

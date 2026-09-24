@@ -25,7 +25,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-200 pt-8 px-4 sm:pt-12 sm:px-8">
-      <div id="box1" className="flex flex-col justify-center items-center mb-8 sm:mb-12">
+      <div id="box1" className="flex flex-col justify-center items-center mb-4 sm:mb-6">
         <h2 className="text-3xl sm:text-5xl font-bold text-gray-800 mb-3 text-center px-2">
           SGPA Calculator
         </h2>
@@ -61,10 +61,32 @@ function App() {
 
       {selectedYear && <YearComponent year={parseInt(selectedYear)} />}
 
-      <div className="text-center text-xs sm:text-sm md:text-base mt-10 pb-2">
-        <p className="text-gray-700">To Report an issue and request features, please visit the <a href="https://github.com/ateendra24/SGPA_Calculator/issues" className="underline">Issues</a> page.</p>
-        <p className="text-gray-600">Appreciate the effort and time taken to make this website. By <a href="https://github.com/ateendra24/SGPA_Calculator" className="underline">giving a star</a> to this repository.</p>
-      </div>
+      <footer className="text-center text-xs sm:text-sm text-gray-500 mt-12 pb-8 space-y-1">
+        <p>
+          To report an issue or request features, visit the{" "}
+          <a
+            href="https://github.com/ateendra24/SGPA_Calculator/issues"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-700 hover:text-blue-600 underline underline-offset-2 transition-colors font-medium"
+          >
+            Issues
+          </a>{" "}
+          page.
+        </p>
+        <p>
+          Appreciate this tool? Consider{" "}
+          <a
+            href="https://github.com/ateendra24/SGPA_Calculator"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-700 hover:text-blue-600 underline underline-offset-2 transition-colors font-medium"
+          >
+            giving a star
+          </a>{" "}
+          to this repository on GitHub.
+        </p>
+      </footer>
 
       <GithubStar />
 

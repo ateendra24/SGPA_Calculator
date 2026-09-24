@@ -284,15 +284,12 @@ function YearComponent({ year }) {
                         <div className="text-2xl sm:text-3xl font-bold text-gray-800 flex items-center gap-3 mt-3">
                             Year {year} YGPA: <span className="text-red-600 bg-red-50 px-4 py-1.5 rounded-xl border border-red-100 shadow-sm">{ygpa}</span>
                         </div>
-                        <span className="text-[11px] text-gray-500 mt-1">
-                            (Weighted for Semester {yearData.semester1.number} & Semester {yearData.semester2.number})
-                        </span>
                     </div>
                 );
             })()}
 
             {/* Subtle Divider between Year Performance & Overall Degree CGPA */}
-            <div className="w-16 h-0.5 bg-gray-300/80 rounded-full my-6 mx-auto"></div>
+            <div className="w-80 h-0.5 bg-black/10 rounded-full my-6 mx-auto"></div>
 
             {/* Overall Program / B.Tech CGPA */}
             <div className="flex flex-col items-center justify-center mb-20 w-full">

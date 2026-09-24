@@ -138,15 +138,9 @@ export default function SemesterTable({
                 })()}
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-2">
-                <button
-                    onClick={calculateSGPA}
-                    className="w-full sm:w-auto text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 font-medium rounded-xl text-lg px-6 py-3 transition-colors duration-200"
-                >
-                    Calculate SGPA
-                </button>
+            <div className="flex justify-end items-center mt-2 px-1">
                 <div className="text-xl sm:text-2xl font-bold text-gray-800">
-                    SGPA: <span className="text-blue-600">{sgpa}</span>
+                    SGPA: <span className="text-blue-600">{sgpa || "0.00"}</span>
                 </div>
             </div>
         </div>

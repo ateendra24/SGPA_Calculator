@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
-import confetti from "canvas-confetti";
+import React, { useMemo, useEffect } from "react";
 import { YEARS_DATA, calculateGrade } from "../constants/data";
 
-// Helper to compute SGPA from marks if user entered marks but hadn't clicked calculate
+// Helper to compute SGPA from marks array
 function computeSgpaFromMarks(marks, semesterData) {
     if (!marks || !semesterData || !semesterData.credits) return 0;
     let totalCreditPoints = 0;
@@ -34,7 +33,7 @@ function computeSgpaFromMarks(marks, semesterData) {
     return parseFloat((totalCreditPoints / totalCredits).toFixed(2));
 }
 
-// Retrieve semester details and check if filled
+// Retrieve semester data across all years
 function getSemesterData(targetYear, semKey, currentYear, currentSgpa, currentMarks) {
     const semData = semKey === 1 ? YEARS_DATA[targetYear].semester1 : YEARS_DATA[targetYear].semester2;
     const totalCredits = semData.credits.filter((c) => c > 0).reduce((a, b) => a + b, 0);
@@ -52,7 +51,7 @@ function getSemesterData(targetYear, semKey, currentYear, currentSgpa, currentMa
         }
     }
 
-    // If not found in current props, check localStorage for calculated SGPA
+    // Check localStorage for calculated SGPA
     if (sgpa === 0) {
         try {
             const storedVal = localStorage.getItem(`sgpa_${targetYear}_sgpa${semKey}`);
@@ -65,7 +64,7 @@ function getSemesterData(targetYear, semKey, currentYear, currentSgpa, currentMa
         } catch { }
     }
 
-    // If still 0, check saved marks in localStorage
+    // Check stored marks in localStorage
     if (sgpa === 0) {
         try {
             const storedMarks = localStorage.getItem(`sgpa_${targetYear}_marks${semKey}`);
@@ -93,26 +92,10 @@ export default function CgpaCalculator({
     currentSgpa2,
     currentMarks1,
     currentMarks2,
+    onInfoChange,
 }) {
-    const [cgpa, setCgpa] = useState(() => {
-        try {
-            const saved = localStorage.getItem("sgpa_overall_cgpa");
-            return saved ? JSON.parse(saved) : "0.00";
-        } catch {
-            return "0.00";
-        }
-    });
-
-    const [includedInfo, setIncludedInfo] = useState(() => {
-        try {
-            const savedInfo = localStorage.getItem("sgpa_overall_cgpa_info");
-            return savedInfo ? JSON.parse(savedInfo) : null;
-        } catch {
-            return null;
-        }
-    });
-
-    const calculateCGPA = () => {
+    // Automatically recalculate overall CGPA in real-time
+    const { cgpa, info } = useMemo(() => {
         const allSemesters = [
             getSemesterData(1, 1, currentYear, currentSgpa1, currentMarks1),
             getSemesterData(1, 2, currentYear, currentSgpa2, currentMarks2),
@@ -124,73 +107,47 @@ export default function CgpaCalculator({
             getSemesterData(4, 2, currentYear, currentSgpa2, currentMarks2),
         ];
 
-        // Filter only semesters that have data filled (SGPA > 0)
-        const filledSemesters = allSemesters.filter((s) => s.isFilled);
+        const filled = allSemesters.filter((s) => s.isFilled);
 
-        if (filledSemesters.length === 0) {
-            setCgpa("0.00");
-            const emptyInfo = { count: 0, semesters: [], credits: 0 };
-            setIncludedInfo(emptyInfo);
-            localStorage.setItem("sgpa_overall_cgpa", JSON.stringify("0.00"));
-            localStorage.setItem("sgpa_overall_cgpa_info", JSON.stringify(emptyInfo));
-            return;
+        if (filled.length === 0) {
+            return { cgpa: "0.00", info: "" };
         }
 
         let totalWeightedPoints = 0;
         let totalCredits = 0;
 
-        filledSemesters.forEach((s) => {
+        filled.forEach((s) => {
             totalWeightedPoints += s.sgpa * s.totalCredits;
             totalCredits += s.totalCredits;
         });
 
-        if (totalCredits > 0) {
-            const finalVal = totalWeightedPoints / totalCredits;
-            const finalStr = finalVal.toFixed(2);
-            setCgpa(finalStr);
-
-            const info = {
-                count: filledSemesters.length,
-                semesters: filledSemesters.map((s) => `Sem ${s.semNumber}`),
-                credits: totalCredits,
-            };
-            setIncludedInfo(info);
-
-            localStorage.setItem("sgpa_overall_cgpa", JSON.stringify(finalStr));
-            localStorage.setItem("sgpa_overall_cgpa_info", JSON.stringify(info));
-
-            if (finalVal >= 8.5) {
-                confetti({
-                    particleCount: 100,
-                    spread: 70,
-                    origin: { y: 0.6 },
-                });
-            }
-        } else {
-            setCgpa("0.00");
-            const emptyInfo = { count: 0, semesters: [], credits: 0 };
-            setIncludedInfo(emptyInfo);
-            localStorage.setItem("sgpa_overall_cgpa", JSON.stringify("0.00"));
-            localStorage.setItem("sgpa_overall_cgpa_info", JSON.stringify(emptyInfo));
+        if (totalCredits === 0) {
+            return { cgpa: "0.00", info: "" };
         }
-    };
+
+        const calculatedCgpa = (totalWeightedPoints / totalCredits).toFixed(2);
+        const infoText = `${filled.map((s) => `Sem ${s.semNumber}`).join(", ")} (${totalCredits} credits)`;
+
+        // Persist to localStorage
+        try {
+            localStorage.setItem("sgpa_overall_cgpa", JSON.stringify(calculatedCgpa));
+        } catch { }
+
+        return {
+            cgpa: calculatedCgpa,
+            info: infoText,
+        };
+    }, [currentYear, currentSgpa1, currentSgpa2, currentMarks1, currentMarks2]);
+
+    useEffect(() => {
+        if (onInfoChange) {
+            onInfoChange(info);
+        }
+    }, [info, onInfoChange]);
 
     return (
-        <div id="box5" className="flex flex-col justify-center items-center mt-2 sm:mt-4 w-full">
-            <button
-                onClick={calculateCGPA}
-                className="w-[90%] sm:w-auto text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 font-medium rounded-xl text-lg px-8 py-4 transition-all duration-200 transform hover:scale-105 mb-3 shadow-lg cursor-pointer"
-            >
-                Calculate CGPA
-            </button>
-            <div className="text-3xl sm:text-4xl font-bold text-gray-800 flex items-center gap-3 mb-2">
-                CGPA: <span className="text-purple-600 bg-purple-50 px-4 py-2 rounded-xl">{cgpa}</span>
-            </div>
-            {includedInfo && includedInfo.count > 0 && (
-                <p className="text-xs sm:text-sm text-gray-500 text-center mb-6">
-                    Calculated for: <span className="font-semibold text-gray-700">{includedInfo.semesters.join(", ")}</span> ({includedInfo.credits} total credits)
-                </p>
-            )}
+        <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 flex items-center gap-3">
+            Overall B.Tech CGPA: <span className="text-purple-600 bg-purple-50 px-5 py-2 rounded-2xl border border-purple-100 shadow-sm">{cgpa}</span>
         </div>
     );
 }

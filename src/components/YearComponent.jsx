@@ -1,24 +1,69 @@
-import React, { useState, useEffect } from "react";
-import confetti from 'canvas-confetti';
-import { YEARS_DATA, calculateGrade } from '../constants/data';
-import SemesterTable from './SemesterTable';
-import CgpaCalculator from './CgpaCalculator';
+import React, { useState, useEffect, useRef } from "react";
+import confetti from "canvas-confetti";
+import { YEARS_DATA, calculateGrade } from "../constants/data";
+import SemesterTable from "./SemesterTable";
+import CgpaCalculator from "./CgpaCalculator";
+
+// Helper to compute SGPA live from marks
+const computeSGPA = (marks, semesterData) => {
+    if (!marks || !semesterData || !semesterData.credits) return "0.00";
+    let totalCreditPoints = 0;
+    let totalCredits = 0;
+    let hasMarks = false;
+
+    marks.forEach((mark, index) => {
+        if (!mark) return;
+        const intVal = mark.internal;
+        const thVal = mark.theory;
+        if (intVal !== "" && intVal !== undefined && intVal !== null) hasMarks = true;
+        if (thVal !== "" && thVal !== undefined && thVal !== null) hasMarks = true;
+
+        const internal = parseInt(intVal) || 0;
+        const theory = parseInt(thVal) || 0;
+        const total = internal + theory;
+        const subjectMax = semesterData.maxMarks?.[index] || 100;
+        const normalizedTotal = (total / subjectMax) * 100;
+        const grade = calculateGrade(normalizedTotal);
+        const credit = semesterData.credits[index] || 0;
+
+        if (credit > 0) {
+            totalCreditPoints += grade * credit;
+            totalCredits += credit;
+        }
+    });
+
+    if (!hasMarks || totalCredits === 0) return "0.00";
+    return (totalCreditPoints / totalCredits).toFixed(2);
+};
+
+// Helper to compute YGPA live from SGPA1 and SGPA2
+const computeYGPA = (s1, s2, sem1Data, sem2Data) => {
+    const s1Num = parseFloat(s1) || 0;
+    const s2Num = parseFloat(s2) || 0;
+    const sem1Credits = sem1Data.credits.filter((c) => c > 0).reduce((a, b) => a + b, 0);
+    const sem2Credits = sem2Data.credits.filter((c) => c > 0).reduce((a, b) => a + b, 0);
+
+    let totalPoints = 0;
+    let totalCredits = 0;
+
+    if (s1Num > 0) {
+        totalPoints += s1Num * sem1Credits;
+        totalCredits += sem1Credits;
+    }
+    if (s2Num > 0) {
+        totalPoints += s2Num * sem2Credits;
+        totalCredits += sem2Credits;
+    }
+
+    if (totalCredits === 0) return "0.00";
+    return (totalPoints / totalCredits).toFixed(2);
+};
 
 function YearComponent({ year }) {
     const yearData = YEARS_DATA[year];
 
     if (!yearData || !yearData.semester1 || !yearData.semester2) {
         return <div>Invalid year selected</div>;
-    }
-
-    // Validate data integrity
-    if (yearData.semester1.subjects.length !== yearData.semester1.credits.length) {
-        console.error(`Semester ${yearData.semester1.number}: subjects/credits length mismatch`,
-            yearData.semester1.subjects.length, yearData.semester1.credits.length);
-    }
-    if (yearData.semester2.subjects.length !== yearData.semester2.credits.length) {
-        console.error(`Semester ${yearData.semester2.number}: subjects/credits length mismatch`,
-            yearData.semester2.subjects.length, yearData.semester2.credits.length);
     }
 
     // LocalStorage keys per year
@@ -33,141 +78,135 @@ function YearComponent({ year }) {
         return defaultValue;
     };
 
-    const [marks1, setMarks1] = useState(() => getInitial('marks1', yearData.semester1.subjects.map(() => ({ internal: "", theory: "" }))));
-    const [marks2, setMarks2] = useState(() => getInitial('marks2', yearData.semester2.subjects.map(() => ({ internal: "", theory: "" }))));
-    const [sgpa1, setSgpa1] = useState(() => getInitial('sgpa1', 0));
-    const [sgpa2, setSgpa2] = useState(() => getInitial('sgpa2', 0));
-    const [ygpa, setYgpa] = useState(() => getInitial('ygpa', 0));
+    const [marks1, setMarks1] = useState(() =>
+        getInitial("marks1", yearData.semester1.subjects.map(() => ({ internal: "", theory: "" })))
+    );
+    const [marks2, setMarks2] = useState(() =>
+        getInitial("marks2", yearData.semester2.subjects.map(() => ({ internal: "", theory: "" })))
+    );
 
-    // Reset handler for this year
-    const handleReset = () => {
-        localStorage.removeItem(storageKey('marks1'));
-        localStorage.removeItem(storageKey('marks2'));
-        localStorage.removeItem(storageKey('sgpa1'));
-        localStorage.removeItem(storageKey('sgpa2'));
-        localStorage.removeItem(storageKey('ygpa'));
-        setMarks1(yearData.semester1.subjects.map(() => ({ internal: "", theory: "" })));
-        setMarks2(yearData.semester2.subjects.map(() => ({ internal: "", theory: "" })));
-        setSgpa1(0);
-        setSgpa2(0);
-        setYgpa(0);
-    };
+    const [sgpa1, setSgpa1] = useState(() => computeSGPA(marks1, yearData.semester1));
+    const [sgpa2, setSgpa2] = useState(() => computeSGPA(marks2, yearData.semester2));
+    const [ygpa, setYgpa] = useState(() =>
+        computeYGPA(
+            computeSGPA(marks1, yearData.semester1),
+            computeSGPA(marks2, yearData.semester2),
+            yearData.semester1,
+            yearData.semester2
+        )
+    );
 
-    // Reset state when year changes
+    const [cgpaInfo, setCgpaInfo] = useState("");
+    const confettiFired = useRef({ s1: false, s2: false });
+
+    // Handle year change
     useEffect(() => {
-        setMarks1(getInitial('marks1', yearData.semester1.subjects.map(() => ({ internal: "", theory: "" }))));
-        setMarks2(getInitial('marks2', yearData.semester2.subjects.map(() => ({ internal: "", theory: "" }))));
-        setSgpa1(getInitial('sgpa1', 0));
-        setSgpa2(getInitial('sgpa2', 0));
-        setYgpa(getInitial('ygpa', 0));
+        const loadedMarks1 = getInitial(
+            "marks1",
+            yearData.semester1.subjects.map(() => ({ internal: "", theory: "" }))
+        );
+        const loadedMarks2 = getInitial(
+            "marks2",
+            yearData.semester2.subjects.map(() => ({ internal: "", theory: "" }))
+        );
+        const computedS1 = computeSGPA(loadedMarks1, yearData.semester1);
+        const computedS2 = computeSGPA(loadedMarks2, yearData.semester2);
+
+        setMarks1(loadedMarks1);
+        setMarks2(loadedMarks2);
+        setSgpa1(computedS1);
+        setSgpa2(computedS2);
+        setYgpa(computeYGPA(computedS1, computedS2, yearData.semester1, yearData.semester2));
+        confettiFired.current = { s1: false, s2: false };
     }, [year]);
 
-    // Save to localStorage on change
-    useEffect(() => { localStorage.setItem(storageKey('marks1'), JSON.stringify(marks1)); }, [marks1]);
-    useEffect(() => { localStorage.setItem(storageKey('marks2'), JSON.stringify(marks2)); }, [marks2]);
-    useEffect(() => { localStorage.setItem(storageKey('sgpa1'), JSON.stringify(sgpa1)); }, [sgpa1]);
-    useEffect(() => { localStorage.setItem(storageKey('sgpa2'), JSON.stringify(sgpa2)); }, [sgpa2]);
-    useEffect(() => { localStorage.setItem(storageKey('ygpa'), JSON.stringify(ygpa)); }, [ygpa]);
+    // Live auto-calculate SGPA1 when marks1 change
+    useEffect(() => {
+        const s1 = computeSGPA(marks1, yearData.semester1);
+        setSgpa1(s1);
+
+        // Optional celebration when complete semester has high score
+        const s1Num = parseFloat(s1) || 0;
+        const allFilled = marks1.every((m) => m.internal !== "" && m.theory !== "");
+        if (allFilled && s1Num >= 8.5 && !confettiFired.current.s1) {
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            confettiFired.current.s1 = true;
+        } else if (s1Num < 8.5) {
+            confettiFired.current.s1 = false;
+        }
+    }, [marks1, yearData.semester1]);
+
+    // Live auto-calculate SGPA2 when marks2 change
+    useEffect(() => {
+        const s2 = computeSGPA(marks2, yearData.semester2);
+        setSgpa2(s2);
+
+        const s2Num = parseFloat(s2) || 0;
+        const allFilled = marks2.every((m) => m.internal !== "" && m.theory !== "");
+        if (allFilled && s2Num >= 8.5 && !confettiFired.current.s2) {
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            confettiFired.current.s2 = true;
+        } else if (s2Num < 8.5) {
+            confettiFired.current.s2 = false;
+        }
+    }, [marks2, yearData.semester2]);
+
+    // Live auto-calculate YGPA when SGPA1 or SGPA2 change
+    useEffect(() => {
+        const y = computeYGPA(sgpa1, sgpa2, yearData.semester1, yearData.semester2);
+        setYgpa(y);
+    }, [sgpa1, sgpa2, yearData.semester1, yearData.semester2]);
+
+    // Persist to localStorage on change
+    useEffect(() => {
+        localStorage.setItem(storageKey("marks1"), JSON.stringify(marks1));
+    }, [marks1]);
+
+    useEffect(() => {
+        localStorage.setItem(storageKey("marks2"), JSON.stringify(marks2));
+    }, [marks2]);
+
+    useEffect(() => {
+        localStorage.setItem(storageKey("sgpa1"), JSON.stringify(sgpa1));
+    }, [sgpa1]);
+
+    useEffect(() => {
+        localStorage.setItem(storageKey("sgpa2"), JSON.stringify(sgpa2));
+    }, [sgpa2]);
+
+    useEffect(() => {
+        localStorage.setItem(storageKey("ygpa"), JSON.stringify(ygpa));
+    }, [ygpa]);
 
     const handleInputChange = (index, type, value) => {
         if (index < 0 || index >= marks1.length) return;
         const newMarks = [...marks1];
-        newMarks[index] = { ...newMarks[index], [type]: parseInt(value) || 0 };
+        const parsedVal = value === "" ? "" : parseInt(value) || 0;
+        newMarks[index] = { ...newMarks[index], [type]: parsedVal };
         setMarks1(newMarks);
-    };
-
-    const calculateSGPA = () => {
-        let totalCreditPoints = 0;
-        let totalCredits = 0;
-
-        marks1.forEach((mark, index) => {
-            const total = mark.internal + mark.theory;
-            const subjectMax = yearData.semester1.maxMarks?.[index] || 100;
-            // Normalize to 0–100 scale for grade calculation
-            const normalizedTotal = (total / subjectMax) * 100;
-            const grade = calculateGrade(normalizedTotal);
-            const credit = yearData.semester1.credits[index] || 0;
-
-            // Only include subjects with credits > 0 in SGPA calculation
-            if (credit > 0) {
-                const creditPoints = grade * credit;
-                totalCreditPoints += creditPoints;
-                totalCredits += credit;
-            }
-        });
-
-        // Prevent division by zero
-        const sgpa = totalCredits > 0 ? totalCreditPoints / totalCredits : 0;
-        console.log(`Semester ${yearData.semester1.number}: totalCreditPoints=${totalCreditPoints}, totalCredits=${totalCredits}, SGPA=${sgpa}`);
-        setSgpa1(sgpa.toFixed(2));
-
-        if (sgpa >= 8.5) {
-            confetti({
-                particleCount: 100,
-                spread: 70,
-                origin: { y: 0.6 }
-            });
-        }
     };
 
     const handleInputChange2 = (index2, type2, value2) => {
         if (index2 < 0 || index2 >= marks2.length) return;
         const newMarks2 = [...marks2];
-        newMarks2[index2] = {
-            ...newMarks2[index2],
-            [type2]: parseInt(value2) || 0,
-        };
+        const parsedVal = value2 === "" ? "" : parseInt(value2) || 0;
+        newMarks2[index2] = { ...newMarks2[index2], [type2]: parsedVal };
         setMarks2(newMarks2);
     };
 
-    const calculateSGPA2 = () => {
-        let totalCreditPoints = 0;
-        let totalCredits = 0;
-
-        marks2.forEach((mark2, index) => {
-            const total2 = mark2.internal + mark2.theory;
-            const subjectMax2 = yearData.semester2.maxMarks?.[index] || 100;
-            // Normalize to 0–100 scale for grade calculation
-            const normalizedTotal2 = (total2 / subjectMax2) * 100;
-            const grade2 = calculateGrade(normalizedTotal2);
-            const credit2 = yearData.semester2.credits[index] || 0;
-
-            // Only include subjects with credits > 0 in SGPA calculation
-            if (credit2 > 0) {
-                const creditPoints2 = grade2 * credit2;
-                totalCreditPoints += creditPoints2;
-                totalCredits += credit2;
-            }
-        });
-
-        // Prevent division by zero
-        const sgpa2 = totalCredits > 0 ? totalCreditPoints / totalCredits : 0;
-        console.log(`Semester ${yearData.semester2.number}: totalCreditPoints=${totalCreditPoints}, totalCredits=${totalCredits}, SGPA=${sgpa2}`);
-        setSgpa2(sgpa2.toFixed(2));
-
-        if (sgpa2 >= 8.5) {
-            confetti({
-                particleCount: 100,
-                spread: 70,
-                origin: { y: 0.6 }
-            });
-        }
-    };
-
-    const calculateYGPA = () => {
-        // Calculate total credits for each semester (excluding zero credits)
-        const semester1Credits = yearData.semester1.credits.filter(credit => credit > 0).reduce((a, b) => a + b, 0);
-        const semester2Credits = yearData.semester2.credits.filter(credit => credit > 0).reduce((a, b) => a + b, 0);
-
-        const totalCredits = semester1Credits + semester2Credits;
-
-        // Prevent division by zero and ensure valid SGPA values
-        if (totalCredits > 0 && !isNaN(parseFloat(sgpa1)) && !isNaN(parseFloat(sgpa2))) {
-            const final = (parseFloat(sgpa1) * semester1Credits + parseFloat(sgpa2) * semester2Credits) / totalCredits;
-            setYgpa(final.toFixed(2));
-        } else {
-            setYgpa("0.00");
-        }
+    // Reset handler for this year
+    const handleReset = () => {
+        localStorage.removeItem(storageKey("marks1"));
+        localStorage.removeItem(storageKey("marks2"));
+        localStorage.removeItem(storageKey("sgpa1"));
+        localStorage.removeItem(storageKey("sgpa2"));
+        localStorage.removeItem(storageKey("ygpa"));
+        setMarks1(yearData.semester1.subjects.map(() => ({ internal: "", theory: "" })));
+        setMarks2(yearData.semester2.subjects.map(() => ({ internal: "", theory: "" })));
+        setSgpa1("0.00");
+        setSgpa2("0.00");
+        setYgpa("0.00");
+        confettiFired.current = { s1: false, s2: false };
     };
 
     return (
@@ -190,9 +229,10 @@ function YearComponent({ year }) {
                         credits={yearData.semester1.credits}
                         maxMarks={yearData.semester1.maxMarks || []}
                         handleInputChange={handleInputChange}
-                        totalCredits={yearData.semester1.credits.filter(credit => credit > 0).reduce((a, b) => a + b, 0)}
+                        totalCredits={yearData.semester1.credits
+                            .filter((credit) => credit > 0)
+                            .reduce((a, b) => a + b, 0)}
                         sgpa={sgpa1}
-                        calculateSGPA={calculateSGPA}
                     />
                     <SemesterTable
                         semesterNumber={yearData.semester2.number}
@@ -201,51 +241,75 @@ function YearComponent({ year }) {
                         credits={yearData.semester2.credits}
                         maxMarks={yearData.semester2.maxMarks || []}
                         handleInputChange={handleInputChange2}
-                        totalCredits={yearData.semester2.credits.filter(credit => credit > 0).reduce((a, b) => a + b, 0)}
+                        totalCredits={yearData.semester2.credits
+                            .filter((credit) => credit > 0)
+                            .reduce((a, b) => a + b, 0)}
                         sgpa={sgpa2}
-                        calculateSGPA={calculateSGPA2}
                     />
                 </div>
             </div>
 
+            {/* Year-Specific Performance (Directly beneath the year's semester tables) */}
             {(() => {
-                const marks1Total = marks1.reduce((acc, curr) => acc + (parseInt(curr.internal) || 0) + (parseInt(curr.theory) || 0), 0);
-                const marks2Total = marks2.reduce((acc, curr) => acc + (parseInt(curr.internal) || 0) + (parseInt(curr.theory) || 0), 0);
+                const marks1Total = marks1.reduce(
+                    (acc, curr) => acc + (parseInt(curr.internal) || 0) + (parseInt(curr.theory) || 0),
+                    0
+                );
+                const marks2Total = marks2.reduce(
+                    (acc, curr) => acc + (parseInt(curr.internal) || 0) + (parseInt(curr.theory) || 0),
+                    0
+                );
                 const totalObtained = marks1Total + marks2Total;
-                // Sum actual max marks per subject (defaults to 100)
-                const sem1Max = marks1.reduce((acc, _, i) => acc + (yearData.semester1.maxMarks?.[i] || 100), 0);
-                const sem2Max = marks2.reduce((acc, _, i) => acc + (yearData.semester2.maxMarks?.[i] || 100), 0);
+                const sem1Max = marks1.reduce(
+                    (acc, _, i) => acc + (yearData.semester1.maxMarks?.[i] || 100),
+                    0
+                );
+                const sem2Max = marks2.reduce(
+                    (acc, _, i) => acc + (yearData.semester2.maxMarks?.[i] || 100),
+                    0
+                );
                 const totalMax = sem1Max + sem2Max;
                 const percentage = totalMax > 0 ? ((totalObtained / totalMax) * 100).toFixed(2) : "0.00";
 
                 return (
-                    <div className="flex gap-4 text-gray-700 bg-white/50 px-6 py-3 rounded-xl border border-white shadow-sm mt-3 w-fit mx-auto">
-                        <span className="font-medium">Total: {totalObtained}/{totalMax}</span>
-                        <span className="w-px bg-gray-300"></span>
-                        <span className="font-medium text-blue-600">{percentage}%</span>
+                    <div className="flex flex-col items-center justify-center mt-5 w-full">
+                        {/* Marks & Percentage Pill */}
+                        <div className="flex gap-4 text-gray-700 bg-white/50 px-6 py-2.5 rounded-xl border border-white shadow-sm w-fit mx-auto text-sm sm:text-base">
+                            <span className="font-medium">Year {year} Total: <span className="font-semibold text-gray-900">{totalObtained}/{totalMax}</span></span>
+                            <span className="w-px bg-gray-300"></span>
+                            <span className="font-semibold text-blue-600">{percentage}%</span>
+                        </div>
+
+                        {/* Year {year} YGPA */}
+                        <div className="text-2xl sm:text-3xl font-bold text-gray-800 flex items-center gap-3 mt-3">
+                            Year {year} YGPA: <span className="text-red-600 bg-red-50 px-4 py-1.5 rounded-xl border border-red-100 shadow-sm">{ygpa}</span>
+                        </div>
+                        <span className="text-[11px] text-gray-500 mt-1">
+                            (Weighted for Semester {yearData.semester1.number} & Semester {yearData.semester2.number})
+                        </span>
                     </div>
                 );
             })()}
 
-            <div id="box4" className="flex flex-col justify-center items-center mt-4 sm:mt-6 w-full">
-                <button
-                    onClick={calculateYGPA}
-                    className="w-[90%] sm:w-auto text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 font-medium rounded-xl text-lg px-8 py-4 transition-all duration-200 transform hover:scale-105 mb-3 shadow-lg"
-                >
-                    Calculate YGPA
-                </button>
-                <div className="text-3xl sm:text-4xl font-bold text-gray-800 flex items-center gap-3 mb-4">
-                    YGPA: <span className="text-red-600 bg-red-50 px-4 py-2 rounded-xl">{ygpa}</span>
-                </div>
-            </div>
+            {/* Subtle Divider between Year Performance & Overall Degree CGPA */}
+            <div className="w-16 h-0.5 bg-gray-300/80 rounded-full my-6 mx-auto"></div>
 
-            <CgpaCalculator
-                currentYear={year}
-                currentSgpa1={sgpa1}
-                currentSgpa2={sgpa2}
-                currentMarks1={marks1}
-                currentMarks2={marks2}
-            />
+            {/* Overall Program / B.Tech CGPA */}
+            <div className="flex flex-col items-center justify-center mb-20 w-full">
+                <CgpaCalculator
+                    currentYear={year}
+                    currentSgpa1={sgpa1}
+                    currentSgpa2={sgpa2}
+                    currentMarks1={marks1}
+                    currentMarks2={marks2}
+                    onInfoChange={setCgpaInfo}
+                />
+                {cgpaInfo && (
+                    <p className="text-xs sm:text-sm text-gray-500 text-center mt-2">
+                        Calculated across: <span className="font-medium text-gray-700">{cgpaInfo}</span>
+                    </p>
+                )}
+            </div>
         </>
     );
 }

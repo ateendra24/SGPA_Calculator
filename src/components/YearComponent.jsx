@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import confetti from 'canvas-confetti';
 import { YEARS_DATA, calculateGrade } from '../constants/data';
 import SemesterTable from './SemesterTable';
+import CgpaCalculator from './CgpaCalculator';
 
 function YearComponent({ year }) {
     const yearData = YEARS_DATA[year];
@@ -237,6 +238,14 @@ function YearComponent({ year }) {
                     YGPA: <span className="text-red-600 bg-red-50 px-4 py-2 rounded-xl">{ygpa}</span>
                 </div>
             </div>
+
+            <CgpaCalculator
+                currentYear={year}
+                currentSgpa1={sgpa1}
+                currentSgpa2={sgpa2}
+                currentMarks1={marks1}
+                currentMarks2={marks2}
+            />
         </>
     );
 }

@@ -86,6 +86,50 @@ function getSemesterData(targetYear, semKey, currentYear, currentSgpa, currentMa
     };
 }
 
+// Smart summary for completed semesters without repeating "Sem"
+function formatSemesterSummary(filledSemesters, totalCredits) {
+    if (!filledSemesters || filledSemesters.length === 0) return "";
+
+    const semNumbers = filledSemesters.map((s) => s.semNumber).sort((a, b) => a - b);
+
+    // If all 8 semesters are present
+    if (semNumbers.length === 8) {
+        return `All 8 Semesters (${totalCredits} credits)`;
+    }
+
+    // If consecutive starting from 1 (e.g. 1 to 4)
+    const isConsecutiveFromOne = semNumbers.every((num, idx) => num === idx + 1);
+    if (isConsecutiveFromOne) {
+        if (semNumbers.length === 1) {
+            return `Semester 1 (${totalCredits} credits)`;
+        }
+        if (semNumbers.length === 2) {
+            return `Semesters 1 & 2 (${totalCredits} credits)`;
+        }
+        return `Semesters 1–${semNumbers[semNumbers.length - 1]} (${totalCredits} credits)`;
+    }
+
+    // General range compressor (e.g. [1, 2, 4, 5, 6] -> "Semesters 1–2, 4–6")
+    const ranges = [];
+    let start = semNumbers[0];
+    let prev = semNumbers[0];
+
+    for (let i = 1; i < semNumbers.length; i++) {
+        const curr = semNumbers[i];
+        if (curr === prev + 1) {
+            prev = curr;
+        } else {
+            ranges.push(start === prev ? `${start}` : `${start}–${prev}`);
+            start = curr;
+            prev = curr;
+        }
+    }
+    ranges.push(start === prev ? `${start}` : `${start}–${prev}`);
+
+    const prefix = semNumbers.length > 1 ? "Semesters" : "Semester";
+    return `${prefix} ${ranges.join(", ")} (${totalCredits} credits)`;
+}
+
 export default function CgpaCalculator({
     currentYear,
     currentSgpa1,
@@ -126,7 +170,7 @@ export default function CgpaCalculator({
         }
 
         const calculatedCgpa = (totalWeightedPoints / totalCredits).toFixed(2);
-        const infoText = `${filled.map((s) => `Sem ${s.semNumber}`).join(", ")} (${totalCredits} credits)`;
+        const infoText = formatSemesterSummary(filled, totalCredits);
 
         // Persist to localStorage
         try {
@@ -146,7 +190,7 @@ export default function CgpaCalculator({
     }, [info, onInfoChange]);
 
     return (
-        <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 flex items-center gap-3">
+        <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 flex items-center gap-3">
             Overall B.Tech CGPA: <span className="text-purple-600 bg-purple-50 px-5 py-2 rounded-2xl border border-purple-100 shadow-sm">{cgpa}</span>
         </div>
     );

@@ -289,7 +289,7 @@ function YearComponent({ year }) {
             })()}
 
             {/* Subtle Divider between Year Performance & Overall Degree CGPA */}
-            <div className="w-80 h-0.5 bg-black/10 rounded-full my-6 mx-auto"></div>
+            <div className="w-80 h-0.5 bg-black/10 rounded-full my-4 md:my-6 mx-auto"></div>
 
             {/* Overall Program / B.Tech CGPA */}
             <div className="flex flex-col items-center justify-center mb-20 w-full">
@@ -302,8 +302,8 @@ function YearComponent({ year }) {
                     onInfoChange={setCgpaInfo}
                 />
                 {cgpaInfo && (
-                    <p className="text-xs sm:text-sm text-gray-500 text-center mt-2">
-                        Calculated across: <span className="font-medium text-gray-700">{cgpaInfo}</span>
+                    <p className="text-xs sm:text-sm text-gray-500 text-center">
+                        Calculated for: <span className="font-medium text-gray-700">{cgpaInfo}</span>
                     </p>
                 )}
             </div>

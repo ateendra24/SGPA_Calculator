@@ -281,7 +281,7 @@ function YearComponent({ year }) {
                         </div>
 
                         {/* Year {year} YGPA */}
-                        <div className="text-2xl sm:text-3xl font-bold text-gray-800 flex items-center gap-3 mt-3">
+                        <div className="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-3 mt-3">
                             Year {year} YGPA: <span className="text-red-600 bg-red-50 px-4 py-1.5 rounded-xl border border-red-100 shadow-sm">{ygpa}</span>
                         </div>
                     </div>
